@@ -8,7 +8,7 @@ define('GITHUB_REDIRECT_URI', 'https://10.1.213.105/callback.php');
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'mi_basedatos');
 define('DB_USER', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', '2025');
 
 // Conectar a la base de datos
 try {
