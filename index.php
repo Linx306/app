@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// URL para la autenticación de GitHub
 $authUrl = "https://github.com/login/oauth/authorize?client_id=" . GITHUB_CLIENT_ID . "&redirect_uri=" . urlencode(GITHUB_REDIRECT_URI);
 ?>
 
@@ -17,11 +16,11 @@ $authUrl = "https://github.com/login/oauth/authorize?client_id=" . GITHUB_CLIENT
     <h1>Bienvenido a la aplicación con autenticación OAuth</h1>
 
     <?php if (!isset($_SESSION['user'])): ?>
-        <p><a href="<?= $authUrl ?>">Iniciar sesión con GitHub</a></p>
+        <p><a href="<?= htmlspecialchars($authUrl, ENT_QUOTES, 'UTF-8') ?>">Iniciar sesión con GitHub</a></p>
     <?php else: ?>
-        <p>¡Hola, <?= htmlspecialchars($_SESSION['user']['login']) ?>!</p>
+        <p>¡Hola, <?= htmlspecialchars($_SESSION['user']['login'], ENT_QUOTES, 'UTF-8') ?>!</p>
         <p><a href="logout.php">Cerrar sesión</a></p>
-        <img src="<?= htmlspecialchars($_SESSION['user']['avatar_url']) ?>" alt="Avatar" width="50">
+        <img src="<?= htmlspecialchars($_SESSION['user']['avatar_url'], ENT_QUOTES, 'UTF-8') ?>" alt="Avatar" width="50">
     <?php endif; ?>
 
 </body>
