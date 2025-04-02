@@ -7,7 +7,7 @@ define('GITHUB_REDIRECT_URI', 'https://10.1.213.105/callback.php');
 // Configuración de la base de datos SQL (MariaDB)
 
 define('DB_HOST', 'localhost');
-define('DB_USERNAME', 'root');
+define('DB_USER', 'root');
 define('DB_PASSWORD', '2025');
 define('DB_NAME', 'mi_basedatos');
 
