@@ -1,55 +1,48 @@
 <?php
 session_start();
-require_once 'config.php';
+require 'config.php';
 
-// Verificar si hay un código de autorización
 if (isset($_GET['code'])) {
-    // Paso 1: Obtener el token de acceso de GitHub
     $code = $_GET['code'];
-    $url = 'https://github.com/login/oauth/access_token';
-    
+
+    // Intercambio del código por un token de acceso
+    $token_url = "https://github.com/login/oauth/access_token";
     $data = [
-        'client_id' => GITHUB_CLIENT_ID,
-        'client_secret' => GITHUB_CLIENT_SECRET,
-        'code' => $code,
-        'redirect_uri' => GITHUB_REDIRECT_URI,
+        "client_id" => GITHUB_CLIENT_ID,
+        "client_secret" => GITHUB_CLIENT_SECRET,
+        "code" => $code
     ];
-
+    
     $options = [
-        'http' => [
-            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-            'method'  => 'POST',
-            'content' => http_build_query($data),
+        "http" => [
+            "header" => "Content-Type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
+            "method" => "POST",
+            "content" => http_build_query($data)
         ]
     ];
+    $context = stream_context_create($options);
+    $response = file_get_contents($token_url, false, $context);
+    $token_data = json_decode($response, true);
     
-    $context  = stream_context_create($options);
-    $response = file_get_contents($url, false, $context);
-    
-    // Extraer el token de acceso de la respuesta
-    parse_str($response, $output);
-    $access_token = $output['access_token'];
-    
-    // Paso 2: Usar el token de acceso para obtener datos del usuario
-    $userUrl = 'https://api.github.com/user';
-    $options = [
-        'http' => [
-            'header' => "Authorization: Bearer " . $access_token . "\r\n" .
-                        "User-Agent: GitHub OAuth App\r\n",
-            'method' => 'GET'
-        ]
-    ];
-    
-    $context  = stream_context_create($options);
-    $user = json_decode(file_get_contents($userUrl, false, $context), true);
+    if (isset($token_data["access_token"])) {
+        $access_token = $token_data["access_token"];
 
-    // Guardar la información del usuario en la sesión
-    $_SESSION['user'] = $user;
-    
-    // Mostrar los datos del usuario
-    echo '<h1>Bienvenido, ' . htmlspecialchars($user['login']) . '!</h1>';
-    echo '<img src="' . htmlspecialchars($user['avatar_url']) . '" alt="Avatar" width="50">';
-} else {
-    echo "No se recibió el código de autenticación.";
+        // Obtener información del usuario desde GitHub
+        $user_url = "https://api.github.com/user";
+        $options = [
+            "http" => [
+                "header" => "Authorization: token $access_token\r\nUser-Agent: PHP"
+            ]
+        ];
+        $context = stream_context_create($options);
+        $user_info = file_get_contents($user_url, false, $context);
+        $user_data = json_decode($user_info, true);
+
+        $_SESSION["user"] = $user_data["login"];
+        header("Location: index.php");
+        exit();
+    }
 }
+
+echo "Error en la autenticación.";
 ?>
