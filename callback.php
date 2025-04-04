@@ -1,9 +1,6 @@
 <?php
 session_start();
 require 'config.php';
-require 'blockchain.php'; // Agregar la conexión con blockchain
-
-$blockchain = new BlockchainLogger(); // Se crea una instancia para registrar eventos
 
 if (isset($_GET['code'])) {
     $code = $_GET['code'];
@@ -42,14 +39,6 @@ if (isset($_GET['code'])) {
         $user_data = json_decode($user_info, true);
 
         $_SESSION["user"] = $user_data["login"];
-
-        // Guardar registro en blockchain
-        $logMessage = "Inicio de sesión con GitHub: " . $user_data["login"] . " - " . date('Y-m-d H:i:s');
-        $hash = $blockchain->logEvent($logMessage);
-
-        // Se muestra el hash de la transacción
-        echo "Registro en blockchain: " . htmlspecialchars($hash);
-        
         header("Location: index.php");
         exit();
     }
